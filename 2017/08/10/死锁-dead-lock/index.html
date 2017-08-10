@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Java," />
+  <meta name="keywords" content="OS," />
 
 
 
@@ -94,18 +94,18 @@
 
 
 
-<meta name="description" content="talk is cheap, show me the code">
-<meta name="keywords" content="Java">
+<meta name="description" content="大部分死锁与不可抢占式资源有关 可抢占式资源可通过通过控制进程的分配而解决 获取资源的过程可简化为：  申请资源 获取资源 释放资源当一个进程获取资源失败时,进程会休眠一段时间，然后重新获取,知道资源可用为止正是这种行为会导致死锁的发生。  死锁样例假如有两个进程1和进程2,它们都需要两个资源A和B 进程1已经获取到了资源A，进程2已经获取到了资源B 当进程1尝试获取资源B发现已经占用，所以处于阻">
+<meta name="keywords" content="OS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java类加载器">
-<meta property="og:url" content="https://JedrekWang.github.io/2017/08/09/Java类加载器/index.html">
+<meta property="og:title" content="死锁 dead lock">
+<meta property="og:url" content="https://JedrekWang.github.io/2017/08/10/死锁-dead-lock/index.html">
 <meta property="og:site_name" content="Jedrek&#39;s Cabin">
-<meta property="og:description" content="talk is cheap, show me the code">
+<meta property="og:description" content="大部分死锁与不可抢占式资源有关 可抢占式资源可通过通过控制进程的分配而解决 获取资源的过程可简化为：  申请资源 获取资源 释放资源当一个进程获取资源失败时,进程会休眠一段时间，然后重新获取,知道资源可用为止正是这种行为会导致死锁的发生。  死锁样例假如有两个进程1和进程2,它们都需要两个资源A和B 进程1已经获取到了资源A，进程2已经获取到了资源B 当进程1尝试获取资源B发现已经占用，所以处于阻">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-09T07:32:06.689Z">
+<meta property="og:updated_time" content="2017-08-10T12:43:33.294Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java类加载器">
-<meta name="twitter:description" content="talk is cheap, show me the code">
+<meta name="twitter:title" content="死锁 dead lock">
+<meta name="twitter:description" content="大部分死锁与不可抢占式资源有关 可抢占式资源可通过通过控制进程的分配而解决 获取资源的过程可简化为：  申请资源 获取资源 释放资源当一个进程获取资源失败时,进程会休眠一段时间，然后重新获取,知道资源可用为止正是这种行为会导致死锁的发生。  死锁样例假如有两个进程1和进程2,它们都需要两个资源A和B 进程1已经获取到了资源A，进程2已经获取到了资源B 当进程1尝试获取资源B发现已经占用，所以处于阻">
 
 
 
@@ -134,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="https://JedrekWang.github.io/2017/08/09/Java类加载器/"/>
+  <link rel="canonical" href="https://JedrekWang.github.io/2017/08/10/死锁-dead-lock/"/>
 
 
 
 
 
-  <title>Java类加载器 | Jedrek's Cabin</title>
+  <title>死锁 dead lock | Jedrek's Cabin</title>
   
 
 
@@ -277,7 +277,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://JedrekWang.github.io/2017/08/09/Java类加载器/">
+    <link itemprop="mainEntityOfPage" href="https://JedrekWang.github.io/2017/08/10/死锁-dead-lock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jedrek">
@@ -294,7 +294,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Java类加载器</h1>
+          <h1 class="post-title" itemprop="name headline">死锁 dead lock</h1>
         
 
         <div class="post-meta">
@@ -306,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-09T15:30:44+08:00">
-                2017-08-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-10T19:28:44+08:00">
+                2017-08-10
               </time>
             
 
@@ -344,28 +344,35 @@
       
 
       
-        <p>talk is cheap, show me the code<br><a id="more"></a></p>
-<h1 id="ClassLoader小结"><a href="#ClassLoader小结" class="headerlink" title="ClassLoader小结"></a>ClassLoader小结</h1><p>Java的ClassLoader负责将Java类的字节码(.class文件)加载到Java虚拟机(JVM)中<br>&gt;<br>ClassLoader的概念被广泛应用到Java框架中(ex:Spring),下面我来自己总结一下ClassLoader<br>&gt;<br>首先Java虚拟机用到一个对象的过程如下：首先程序员编写了一个Java类(.java文件)，经过Java编译器<br>转换为字节码(.class文件)，然后类加载器加载该字节码并生成一个java.lang.Class对象，通过Class的<br>各种方法(ex:直接newInstance();)来生成一个对象。<br>&gt;<br>tips：<br>这里提一下Java虚拟机如何确定两个类是否相等，除了比较类的名字外还会比较类的类加载器是否相等。<br>换言之，如果两个类的名字相同但类加载器不同，则虚拟机会把它们当成两个类<br>&gt;<br>Java的类加载器有两类，一种是系统自带的ClssLoader,一种是程序员自己编写的ClassLoader<br>&gt;</p>
-<ul>
-<li>对于系统自带的ClassLoader有三种：<blockquote>
-<p>bootStrap ClassLoader(引导类加载器) -&gt; 加载Java的核心库</p>
-<blockquote>
-<p>extensions ClassLoader(扩展类加载器) -&gt; 加载Java的扩展库</p>
-<blockquote>
-<p>system ClassLoader(系统类加载器)   -&gt; 根据CLASSPATH来加载类</p>
-</blockquote>
-</blockquote>
-<p>通过 ClassLoader的getParent()方法我们可以得到他们的父子关系为：bootStrap ClassLoader是<br>extensions ClassLoader的父加载器，extensions ClassLoader是 system ClassLoader的父加载器，extensions</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class ClassLoaderTest &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        ClassLoader classLoader = ClassLoaderTest.class.getClassLoader();</div><div class="line">        while(classLoader != null) &#123;</div><div class="line">            System.out.println(classLoader);</div><div class="line">            classLoader = classLoader.getParent();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</blockquote>
-</li>
-</ul>
-<p>上述代码证实了这点，需要指出的是bootstrap ClassLoader由于jdk的原因会返回null<br>&gt;<br>运行结果为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sun.misc.Launcher$ExtClassLoader@28d93b30</div></pre></td></tr></table></figure></p>
-<p>&gt;<br>Java使用了一种特殊的机制来加载类：双亲委托机制.即：当一个类请求给一个类加载器时，这个类加载器不会立即加载，而是<br>委托给父加载器依次类推，只有当父类无法加载时，才会由自己加载。<br>&gt;<br>这种机制的优点:</p>
+        <h3 id="大部分死锁与不可抢占式资源有关"><a href="#大部分死锁与不可抢占式资源有关" class="headerlink" title="大部分死锁与不可抢占式资源有关"></a>大部分死锁与不可抢占式资源有关</h3><p> 可抢占式资源可通过通过控制进程的分配而解决<br> 获取资源的过程可简化为：</p>
 <ol>
-<li>避免重复加载，当父类加载器可以加载时，子类加载器不会加载</li>
-<li>安全，如果用户自己定义了一个Object类，会先加载Java核心包的Object<br>&gt;<br>由于这种机制，使得开启类加载的可能与真正加载类的类加载器不一致，前者称为初始加载器，后者称为定义加载器，而Java比较对象<br>是使用定义加载器，所有定义加载器才是真正用于Java类的认证的<br>&gt;<br>第二种类加载器是用户自己定义的类加载器，用户可以继承ClassLoader类，然后自己实现类的findClass()方法<br>&gt;<br>PS: 对于Web容器来说，比如Tomcat的类加载机制与上面所讲的刚好相反，即先自己尝试加载类，然后再交给父加载器。这样做的目的是<br>Web 应用自己的类的优先级高于 Web 容器提供的类，当然Java核心库的类除外，原因上面已经陈述。</li>
+<li>申请资源</li>
+<li>获取资源</li>
+<li>释放资源<br>当一个进程获取资源失败时,进程会休眠一段时间，然后重新获取,知道资源可用为止<br>正是这种行为会导致死锁的发生。</li>
 </ol>
+<h3 id="死锁样例"><a href="#死锁样例" class="headerlink" title="死锁样例"></a>死锁样例</h3><p><code>假如有两个进程1和进程2,它们都需要两个资源A和B
+进程1已经获取到了资源A，进程2已经获取到了资源B
+当进程1尝试获取资源B发现已经占用，所以处于阻塞状态
+而进程2尝试获取资源A，由于进程1已经获取了，所以也等待资源
+可以发现的是，俩个进程都缺乏彼此拥有的资源，导致无限期等待下去</code></p>
+<pre><code>&gt; 至于如何上例中的死锁如何处理，一种简单的方法是规定所有资源的使用顺序
+&gt; 比如，必须先获取资源A，再获取资源B，这样进程2就会等待进程1完成后释放资源后成功执行
+</code></pre><h3 id="死锁条件"><a href="#死锁条件" class="headerlink" title="死锁条件"></a>死锁条件</h3><p>死锁的规范定义为：如果一个进程集合中的每个进程都在等待只能由该集合中的其他进程才能引发的事件，那么该进程组为死锁<br>资源型死锁的四种条件：</p>
+<ol>
+<li>互斥条件</li>
+<li>占有和等待条件</li>
+<li>不可抢占条件</li>
+<li>环路等待条件<br>互斥即指资源只能同时被一个进程所获取，其他进程获取会阻塞<br>占有和等待指 进程可以占用多个资源<br>不可抢占指 进程获取资源后只能主动释放，无法强制抢占给其他进程使用<br>环路等待指 系统中进程与获取的资源形成一条环，互相等待<br>&gt;<br>根据死锁的条件我们可以想到避免死锁的办法就是处理上述的四种条件，只要一种条件不满足，死锁就不会发生<h3 id="判断死锁是否发生"><a href="#判断死锁是否发生" class="headerlink" title="判断死锁是否发生"></a>判断死锁是否发生</h3></li>
+<li>第一种情况： 每一种资源只有一个实例<br>我们把每一个进程，和每一个资源即每一种都当做图中的一个节点<br>进程所需的资源与进程用有向线段链接，那么判断死锁是否存在就变成了一道经典的算法问题，即求有向图是否存在环路<br>可以深度遍历有向图，并记录所经过的节点，如果遍历过程发现已经记录的节点，那么就存在死锁<br>回溯该节点可以找到对应死锁的进程</li>
+<li>第二种情况： 多种相同的资源<br>我们可以通过记录两个矩阵，分别对应当前可用的各种资源和各个进程所需要获取的资源<br>我们可以优先分配资源给可以直接远行的进程，并且当进程运行完成时，释放拥有的全部资源，更新可用资源的矩阵<br>那么我们如果可以找出这么一条队列使得所有进程都可以满足资源的分配，那么就不存在死锁或者可解决死锁<br>如果找不到这么一条队列的话，死锁就可能发生<br>这种思路与经典的银行家算法类似<h3 id="解决死锁的办法"><a href="#解决死锁的办法" class="headerlink" title="解决死锁的办法"></a>解决死锁的办法</h3></li>
+<li>那么号称计算机历史上最著名的算法就可以解决死锁，那就是鸵鸟算法<br>具体算法是忽略该问题，当作什么也没发生。正如我们平常电脑遇到问题，当作没发生任何问题，直接重启。</li>
+<li>通过破坏不可抢占条件解决<br>通过挂起进程后强制取走资源给其他进程使用，使用完成后在归还原进程，让原进程恢复运行<br>缺点： 在不通知原进程前提下，强制抢走资源，会导致难以或无法恢复运行</li>
+<li>通过回滚恢复<br>我们可以周期性的对进程建立检查点 checkpoint ，当系统检测到死锁可能发生时，通过回滚到上一个检查点，<br>检查点之后的所有工作全部丢弃。通过回滚进程实现资源的重新分配来避免死锁<br>tips： 数据库的事务控制就是采用的上述策略</li>
+<li>通过杀死进程恢复<br>这也是最简单的方法了，通过杀死有向环中的一段来解决死锁<br>缺点： 对于杀死进程的选择很重要，如果进程执行重要操作直接杀死会导致用户崩溃 （滑稽</li>
+<li>前面已经提到了这种方法，即所有资源按顺序申请获取<br>缺点： 当一个进程运行前，我们无法获取进程所需的全部资源</li>
+<li>在死锁未发生前，避免死锁<br>既然死锁的发生与资源有很大关系，那么当我们分配资源时，去避免分配不是绝对必须的资源，即实现资源的最少分配</li>
+</ol>
+<h3 id="其余死锁"><a href="#其余死锁" class="headerlink" title="其余死锁"></a>其余死锁</h3><p>前面提到死锁大部分与资源有关，那么那小部分呢<br>一种称为通信死锁<br>因为信道是无可靠的，所有会导致通信两端的信号为发送出去或发送失败，而另一端因为等待信号一直阻塞<br>解决办法：设置超时时间 即等待制定的时间，超过则放弃获取。</p>
 <p>by Jedrek</p>
 
       
@@ -384,7 +391,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+            <a href="/tags/OS/" rel="tag"><i class="fa fa-tag"></i> OS</a>
           
         </div>
       
@@ -397,8 +404,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/09/Spring配置小结/" rel="next" title="Spring配置小结">
-                <i class="fa fa-chevron-left"></i> Spring配置小结
+              <a href="/2017/08/10/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
               </a>
             
           </div>
@@ -406,10 +413,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/08/09/并发设计的细节/" rel="prev" title="并发设计的细节">
-                并发设计的细节 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -547,7 +550,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClassLoader小结"><span class="nav-text">ClassLoader小结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#大部分死锁与不可抢占式资源有关"><span class="nav-text">大部分死锁与不可抢占式资源有关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#死锁样例"><span class="nav-text">死锁样例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#死锁条件"><span class="nav-text">死锁条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断死锁是否发生"><span class="nav-text">判断死锁是否发生</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决死锁的办法"><span class="nav-text">解决死锁的办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其余死锁"><span class="nav-text">其余死锁</span></a></li></ol></div>
             
 
           </div>
