@@ -347,39 +347,14 @@
 
       
         
-          
-            <h3 id="大部分死锁与不可抢占式资源有关"><a href="#大部分死锁与不可抢占式资源有关" class="headerlink" title="大部分死锁与不可抢占式资源有关"></a>大部分死锁与不可抢占式资源有关</h3><p> 可抢占式资源可通过通过控制进程的分配而解决<br> 获取资源的过程可简化为：</p>
-<ol>
-<li>申请资源</li>
-<li>获取资源</li>
-<li>释放资源<br>当一个进程获取资源失败时,进程会休眠一段时间，然后重新获取,知道资源可用为止<br>正是这种行为会导致死锁的发生。</li>
-</ol>
-<h3 id="死锁样例"><a href="#死锁样例" class="headerlink" title="死锁样例"></a>死锁样例</h3><p><code>假如有两个进程1和进程2,它们都需要两个资源A和B
-进程1已经获取到了资源A，进程2已经获取到了资源B
-当进程1尝试获取资源B发现已经占用，所以处于阻塞状态
-而进程2尝试获取资源A，由于进程1已经获取了，所以也等待资源
-可以发现的是，俩个进程都缺乏彼此拥有的资源，导致无限期等待下去</code></p>
-<pre><code>&gt; 至于如何上例中的死锁如何处理，一种简单的方法是规定所有资源的使用顺序
-&gt; 比如，必须先获取资源A，再获取资源B，这样进程2就会等待进程1完成后释放资源后成功执行
-</code></pre><h3 id="死锁条件"><a href="#死锁条件" class="headerlink" title="死锁条件"></a>死锁条件</h3><p>死锁的规范定义为：如果一个进程集合中的每个进程都在等待只能由该集合中的其他进程才能引发的事件，那么该进程组为死锁<br>资源型死锁的四种条件：</p>
-<ol>
-<li>互斥条件</li>
-<li>占有和等待条件</li>
-<li>不可抢占条件</li>
-<li>环路等待条件<br>互斥即指资源只能同时被一个进程所获取，其他进程获取会阻塞<br>占有和等待指 进程可以占用多个资源<br>不可抢占指 进程获取资源后只能主动释放，无法强制抢占给其他进程使用<br>环路等待指 系统中进程与获取的资源形成一条环，互相等待<br>&gt;<br>根据死锁的条件我们可以想到避免死锁的办法就是处理上述的四种条件，只要一种条件不满足，死锁就不会发生<h3 id="判断死锁是否发生"><a href="#判断死锁是否发生" class="headerlink" title="判断死锁是否发生"></a>判断死锁是否发生</h3></li>
-<li>第一种情况： 每一种资源只有一个实例<br>我们把每一个进程，和每一个资源即每一种都当做图中的一个节点<br>进程所需的资源与进程用有向线段链接，那么判断死锁是否存在就变成了一道经典的算法问题，即求有向图是否存在环路<br>可以深度遍历有向图，并记录所经过的节点，如果遍历过程发现已经记录的节点，那么就存在死锁<br>回溯该节点可以找到对应死锁的进程</li>
-<li>第二种情况： 多种相同的资源<br>我们可以通过记录两个矩阵，分别对应当前可用的各种资源和各个进程所需要获取的资源<br>我们可以优先分配资源给可以直接远行的进程，并且当进程运行完成时，释放拥有的全部资源，更新可用资源的矩阵<br>那么我们如果可以找出这么一条队列使得所有进程都可以满足资源的分配，那么就不存在死锁或者可解决死锁<br>如果找不到这么一条队列的话，死锁就可能发生<br>这种思路与经典的银行家算法类似<h3 id="解决死锁的办法"><a href="#解决死锁的办法" class="headerlink" title="解决死锁的办法"></a>解决死锁的办法</h3></li>
-<li>那么号称计算机历史上最著名的算法就可以解决死锁，那就是鸵鸟算法<br>具体算法是忽略该问题，当作什么也没发生。正如我们平常电脑遇到问题，当作没发生任何问题，直接重启。</li>
-<li>通过破坏不可抢占条件解决<br>通过挂起进程后强制取走资源给其他进程使用，使用完成后在归还原进程，让原进程恢复运行<br>缺点： 在不通知原进程前提下，强制抢走资源，会导致难以或无法恢复运行</li>
-<li>通过回滚恢复<br>我们可以周期性的对进程建立检查点 checkpoint ，当系统检测到死锁可能发生时，通过回滚到上一个检查点，<br>检查点之后的所有工作全部丢弃。通过回滚进程实现资源的重新分配来避免死锁<br>tips： 数据库的事务控制就是采用的上述策略</li>
-<li>通过杀死进程恢复<br>这也是最简单的方法了，通过杀死有向环中的一段来解决死锁<br>缺点： 对于杀死进程的选择很重要，如果进程执行重要操作直接杀死会导致用户崩溃 （滑稽</li>
-<li>前面已经提到了这种方法，即所有资源按顺序申请获取<br>缺点： 当一个进程运行前，我们无法获取进程所需的全部资源</li>
-<li>在死锁未发生前，避免死锁<br>既然死锁的发生与资源有很大关系，那么当我们分配资源时，去避免分配不是绝对必须的资源，即实现资源的最少分配</li>
-</ol>
-<h3 id="其余死锁"><a href="#其余死锁" class="headerlink" title="其余死锁"></a>其余死锁</h3><p>前面提到死锁大部分与资源有关，那么那小部分呢<br>一种称为通信死锁<br>因为信道是无可靠的，所有会导致通信两端的信号为发送出去或发送失败，而另一端因为等待信号一直阻塞<br>解决办法：设置超时时间 即等待制定的时间，超过则放弃获取。</p>
-<p>by Jedrek</p>
-
-          
+          <p>life is short , use Python<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/08/10/死锁-dead-lock/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -500,130 +475,6 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/08/10/hello-world/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://JedrekWang.github.io/2017/08/10/my-working-time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jedrek">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jedrek's Cabin">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/10/my-working-time/" itemprop="url">my working time</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-10T19:15:07+08:00">
-                2017-08-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>life is short, use Python</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/08/10/my-working-time/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1529,13 +1380,133 @@
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://JedrekWang.github.io/2017/08/09/My-first-blog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jedrek">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jedrek's Cabin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/09/My-first-blog/" itemprop="url">My first blog</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-09T14:17:11+08:00">
+                2017-08-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>later equals never</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/08/09/My-first-blog/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
 
 
           </div>
@@ -1579,7 +1550,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1592,7 +1563,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
