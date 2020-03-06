@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="You have literary talent that you should take pains to develop.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jdk8新特性小结">
+<meta property="og:url" content="http://yoursite.com/2017/08/09/Jdk8%E6%96%B0%E7%89%B9%E6%80%A7%E5%B0%8F%E7%BB%93/index.html">
+<meta property="og:site_name" content="Jedrek&#39;s Cabin">
+<meta property="og:description" content="You have literary talent that you should take pains to develop.">
+<meta property="article:published_time" content="2017-08-09T07:24:54.000Z">
+<meta property="article:modified_time" content="2020-03-06T08:06:45.713Z">
+<meta property="article:author" content="Jedrek">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2017/08/09/Jdk8%E6%96%B0%E7%89%B9%E6%80%A7%E5%B0%8F%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Jdk8新特性小结 | Jedrek's Cabin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jedrek's Cabin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Later equals never</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/09/Jdk8%E6%96%B0%E7%89%B9%E6%80%A7%E5%B0%8F%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jedrek">
+      <meta itemprop="description" content="I'm fine, fuck you">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jedrek's Cabin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jdk8新特性小结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-09 15:24:54" itemprop="dateCreated datePublished" datetime="2017-08-09T15:24:54+08:00">2017-08-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-06 16:06:45" itemprop="dateModified" datetime="2020-03-06T16:06:45+08:00">2020-03-06</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>You have literary talent that you should take pains to develop.</p>
+<a id="more"></a>
+<h1 id="Java-8-特性小结-PART-I"><a href="#Java-8-特性小结-PART-I" class="headerlink" title="Java 8 特性小结 PART I"></a>Java 8 特性小结 PART I</h1><h2 id="1-Java接口可实现default-method"><a href="#1-Java接口可实现default-method" class="headerlink" title="1. Java接口可实现default method"></a>1. Java接口可实现default method</h2><blockquote>
+</blockquote>
+<pre><code>&gt;下列代码的输出结果为： hehe</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class InterfaceTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        A a &#x3D; new A() &#123;&#125;;</span><br><span class="line">        a.print();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface A &#123;</span><br><span class="line">    default void print() &#123;</span><br><span class="line">        System.out.println(&quot;hehe&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+</blockquote>
+<p>  新版本的接口在原来抽象方法的基础上新增了方法的默认实现，在生成对象时把该接口实现为<br>匿名对象。即 new InerfaceName(){ };大括号中是对接口的其他非default(abstract)方法<br>的具体实现。</p>
+<h2 id="2-Lambda表达式"><a href="#2-Lambda表达式" class="headerlink" title="2. Lambda表达式"></a>2. Lambda表达式</h2><blockquote>
+</blockquote>
+<p>  Lambda表达式的基础语法为:<br>(parameters) -&gt; expression 或 (parameters) -&gt; {statements;}</p>
+<blockquote>
+</blockquote>
+<p>  Lambda表达式是通过与相关的函数式接口相一致，(函数式接口是一种只有一个抽象方法的接口，<br>可实现若干的default方法.Java提供了一个注解@FunctionInterface来表明该接口为一个<br>函数式接口,若不是则出现编译错误),相一致表示一个Lambda表达式与该接口唯一的一个抽象方法匹配。</p>
+<blockquote>
+</blockquote>
+<p>  理论上不用必须加上@FunctionInterface注解，只要保证有一个抽象方法即可，但是加上注解会有<br>错误提醒，所有推荐使用。</p>
+<blockquote>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class LambdaTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">         Sum sum &#x3D; (a,b)-&gt;a+b;</span><br><span class="line">         int answer &#x3D; sum.add(1,2);</span><br><span class="line">        System.out.println(answer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@FunctionalInterface</span><br><span class="line">interface Sum&#123;</span><br><span class="line">    int add(int a, int b);</span><br></pre></td></tr></table></figure>
+<pre><code>&gt; 上述代码中注意``Sum sum = (a,b)-&gt;a+b;``接口的抽象方法与这个Lambda表达式对应，并且将
+方法实现为两个int型参数相加</code></pre><h2 id="3-方法-Method-和构造器-Constructor-引用"><a href="#3-方法-Method-和构造器-Constructor-引用" class="headerlink" title="3. 方法(Method)和构造器(Constructor)引用"></a>3. 方法(Method)和构造器(Constructor)引用</h2><p> Java 8 允许通过符号<code>::</code>来为方法和构造器添加引用</p>
+<blockquote>
+</blockquote>
+<p> 首先测试一下方法的引用：</p>
+<blockquote>
+</blockquote>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> public class MethodTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Coder coder &#x3D; new Coder();</span><br><span class="line">        Power power &#x3D; coder::exchange;</span><br><span class="line">        String answer &#x3D; power.insert(&quot;HelloWorld&quot;);</span><br><span class="line">        System.out.println(answer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Coder &#123;</span><br><span class="line">    public String exchange(String s) &#123;</span><br><span class="line">        return s+&quot;.java&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@FunctionalInterface</span><br><span class="line">interface Power &#123;</span><br><span class="line">    String insert(String s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+</blockquote>
+<p> 上列代码着重看<code>Power power = coder::exchange;</code>我们为coder对象的exchange方法添加了一个Power引用<br> 当我们调用power对象引用的insert方法时，会自动执行exchange的具体实现，上述代码的运行结果为：<code>HelloWorld.java</code></p>
+<blockquote>
+</blockquote>
+<p> 然后我们看下<code>::</code>是如何作用如构造器的：</p>
+<blockquote>
+</blockquote>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> public class ConstructorTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        PeopleFactory&lt;People&gt; factory &#x3D; People::new;</span><br><span class="line">        People people &#x3D; factory.create(&quot;Jedrek&quot;,&quot;Wang&quot;);</span><br><span class="line">        System.out.println(people.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class People &#123;</span><br><span class="line">    String firstName;</span><br><span class="line">    String lastName;</span><br><span class="line"></span><br><span class="line">    People() &#123;&#125;</span><br><span class="line"></span><br><span class="line">    People(String firstName, String lastName) &#123;</span><br><span class="line">        this.firstName &#x3D; firstName;</span><br><span class="line">        this.lastName &#x3D; lastName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;People&#123;&quot; +</span><br><span class="line">                &quot;firstName&#x3D;&#39;&quot; + firstName + &#39;\&#39;&#39; +</span><br><span class="line">                &quot;, lastName&#x3D;&#39;&quot; + lastName + &#39;\&#39;&#39; +</span><br><span class="line">                &#39;&#125;&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">interface PeopleFactory&lt;P extends People&gt; &#123;</span><br><span class="line">    P create(String firstName, String lastName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+</blockquote>
+<p> 上述代码中<code>PeopleFactory&lt;People&gt; factory = People::new;</code>为People类的构造器(new)添加了一个PeopleFactory<People>引用,<br> 使得使用引用的create抽象方法会自动调用People的构造函数来生成对象，值得注意的是如果有多个构造器，Java编译器会自动选择最适合的<br> 构造器</p>
+<blockquote>
+</blockquote>
+<h2 id="4-Lambda表达式的作用范围"><a href="#4-Lambda表达式的作用范围" class="headerlink" title="4. Lambda表达式的作用范围"></a>4. Lambda表达式的作用范围</h2><pre><code>Lambda表达式与匿名类类似，即使用外围类范围的变量时需为final型的变量，但Lambda表达式只需要变量隐含为final即可(即可不声明为</code></pre><p>final，但你不能改变值),如果后面更改值，编译器不会执行该代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class ScopeTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int num &#x3D; 1;</span><br><span class="line">        Sum sum &#x3D; (a,b)-&gt;a+b;</span><br><span class="line">        int answer &#x3D; sum.add(1,num);</span><br><span class="line">        num &#x3D; 2;  &#x2F;&#x2F;这行代码不会编译</span><br><span class="line">        System.out.println(answer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+</blockquote>
+<p>如上所示，虽然讲num值设为2，但输出的值却任然为1+1而不是2+1</p>
+<blockquote>
+</blockquote>
+<p>by Jedrek</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/08/09/%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B0%8F%E7%BB%93/" rel="prev" title="虚拟机小结">
+      <i class="fa fa-chevron-left"></i> 虚拟机小结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/08/09/Spring%E9%85%8D%E7%BD%AE%E5%B0%8F%E7%BB%93/" rel="next" title="Spring配置小结">
+      Spring配置小结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-8-特性小结-PART-I"><span class="nav-number">1.</span> <span class="nav-text">Java 8 特性小结 PART I</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Java接口可实现default-method"><span class="nav-number">1.1.</span> <span class="nav-text">1. Java接口可实现default method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Lambda表达式"><span class="nav-number">1.2.</span> <span class="nav-text">2. Lambda表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-方法-Method-和构造器-Constructor-引用"><span class="nav-number">1.3.</span> <span class="nav-text">3. 方法(Method)和构造器(Constructor)引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Lambda表达式的作用范围"><span class="nav-number">1.4.</span> <span class="nav-text">4. Lambda表达式的作用范围</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jedrek</p>
+  <div class="site-description" itemprop="description">I'm fine, fuck you</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jedrek</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
